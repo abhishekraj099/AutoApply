@@ -1,0 +1,9 @@
+# Redis portable (local dev only)
+redis/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Uploads (user data)
+uploads/
