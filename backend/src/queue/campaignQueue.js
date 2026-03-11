@@ -2,12 +2,24 @@ const { Queue, Worker, QueueEvents } = require('bullmq');
 const config = require('../config');
 const logger = require('../config/logger');
 
-const redisConnection = {
-  host: config.redis.host,
-  port: config.redis.port,
-  password: config.redis.password,
-  maxRetriesPerRequest: null,
-};
+const IORedis = require('ioredis');
+
+// Support both REDIS_URL (Upstash/cloud) and host/port (local)
+let redisConnection;
+if (config.redis.url) {
+  redisConnection = new IORedis(config.redis.url, {
+    maxRetriesPerRequest: null,
+    enableReadyCheck: false,
+    tls: config.redis.url.startsWith('rediss://') ? {} : undefined,
+  });
+} else {
+  redisConnection = {
+    host: config.redis.host,
+    port: config.redis.port,
+    password: config.redis.password,
+    maxRetriesPerRequest: null,
+  };
+}
 
 // Campaign queue — schedules the campaign start
 const campaignQueue = new Queue('campaign-queue', { connection: redisConnection });
