@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { formatDate, formatFileSize } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ export default function ResumesPage() {
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     loadResumes();
@@ -88,15 +89,11 @@ export default function ResumesPage() {
           <h1 className="text-3xl font-bold">Resumes</h1>
           <p className="text-muted-foreground">Upload and manage your resume files (PDF only, max 5MB)</p>
         </div>
-        <label className="cursor-pointer">
-          <Button disabled={uploading} asChild>
-            <span>
-              {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-              Upload Resume
-            </span>
-          </Button>
-          <input type="file" accept=".pdf" className="hidden" onChange={handleUpload} />
-        </label>
+        <Button disabled={uploading} onClick={() => fileInputRef.current?.click()}>
+          {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+          Upload Resume
+        </Button>
+        <input ref={fileInputRef} type="file" accept=".pdf" className="hidden" onChange={handleUpload} />
       </div>
 
       {resumes.length === 0 ? (
